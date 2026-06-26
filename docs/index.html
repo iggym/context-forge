@@ -641,30 +641,30 @@ async function call(
 }
 
 async function extractContext() {
-  extractOutput.textContent =
-    extractOutput.innerHTML = `<div class="loading"></div>`;
 
-  const result =
-    await call(
-      "/extract",
-      {
-        text:
-          extractText.value
-      }
-    );
+  // 1. SHOW LOADING IMMEDIATELY (this is where setLoading goes)
+  setLoading(extractOutput);
 
-  extractOutput.textContent =
-    result.context || "";
+  // 2. CALL API
+  const result = await call("/extract", {
+    text: extractText.value
+  });
 
+  // 3. RENDER RESULT
+  setResult(extractOutput, result.context || "");
+
+  // 4. STORE LOCALLY
   db.contexts.push({
-    type:"extract",
-    content:
-      result.context
+    type: "extract",
+    content: result.context,
+    created: Date.now()
   });
 
   persist();
-}
 
+  // 5. FEEDBACK
+  toast("Context extracted");
+}
 async function optimizeContext() {
   optimizeOutput.textContent =
     extractOutput.innerHTML = `<div class="loading"></div>`;
@@ -948,6 +948,15 @@ cmdInput.addEventListener("input", ()=>{
       cmdList.appendChild(div);
     });
 });
+
+  function setLoading(el){
+  el.innerHTML = `<div class="loading"></div>`;
+}
+
+function setResult(el, text){
+  el.textContent = text;
+}
+}
 </script>
 <div id="cmd">
   <input id="cmdInput" placeholder="Type command..." />
