@@ -956,6 +956,13 @@ cmdInput.addEventListener("input", ()=>{
 function setResult(el, text){
   el.textContent = text;
 }
+
+  function setLoading(el){
+  el.innerHTML = `<div class="loading"></div>`;
+}
+
+function setResult(el, text){
+  el.textContent = text;
 }
 </script>
 <div id="cmd">
