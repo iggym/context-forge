@@ -666,20 +666,34 @@ async function extractContext() {
   toast("Context extracted");
 }
 async function optimizeContext() {
-  optimizeOutput.textContent =
-    extractOutput.innerHTML = `<div class="loading"></div>`;
 
-  const result =
-    await call(
-      "/optimize",
-      {
-        text:
-          optimizeText.value
-      }
+  // 1. show loading safely
+  setLoading(optimizeOutput);
+
+  try {
+
+    // 2. call worker
+    const result = await call("/optimize", {
+      text: optimizeText.value
+    });
+
+    // 3. render result safely
+    setResult(
+      optimizeOutput,
+      result.optimized || ""
     );
 
-  optimizeOutput.textContent =
-    result.optimized || "";
+    toast("Context optimized");
+
+  } catch (err) {
+
+    setResult(
+      optimizeOutput,
+      "Optimization failed: " + err.message
+    );
+
+    toast("Optimizer error");
+  }
 }
 
 async function evaluateContext() {
