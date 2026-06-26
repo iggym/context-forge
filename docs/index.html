@@ -1,988 +1,352 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta
-  name="viewport"
-  content="width=device-width,initial-scale=1"
-/>
-
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Context Forge</title>
 
 <style>
-:root{
-  --bg:#0f172a;
-  --panel:#111827;
-  --panel2:#1f2937;
-  --border:#334155;
-  --text:#f8fafc;
-  --muted:#94a3b8;
-  --accent:#6366f1;
-  --accent2:#06b6d4;
-  --radius:20px;
-  --shadow:
-    0 20px 60px rgba(0,0,0,.35);
-}
-
-*{
-  box-sizing:border-box;
-}
-
-body{
+body {
   margin:0;
-  font-family:
-    Inter,
-    system-ui,
-    sans-serif;
-  background:
-    radial-gradient(
-      circle at top left,
-      rgba(99,102,241,.25),
-      transparent 40%
-    ),
-    radial-gradient(
-      circle at top right,
-      rgba(6,182,212,.2),
-      transparent 40%
-    ),
-    var(--bg);
-  color:var(--text);
-  min-height:100vh;
-}
-
-header{
-  height:72px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 30px;
-  border-bottom:1px solid rgba(255,255,255,.08);
-  backdrop-filter:blur(20px);
-  position:sticky;
-  top:0;
-  background:rgba(15,23,42,.75);
-  z-index:100;
-}
-
-.logo{
-  font-size:24px;
-  font-weight:700;
-}
-
-.logo span{
-  color:var(--accent2);
-}
-
-.layout{
-  display:grid;
-  grid-template-columns:
-    260px 1fr;
-  min-height:
-    calc(100vh - 72px);
-}
-
-aside{
-  border-right:
-    1px solid rgba(255,255,255,.08);
-  padding:20px;
-}
-
-nav button{
-  width:100%;
-  border:none;
-  background:none;
-  color:var(--text);
-  text-align:left;
-  padding:14px;
-  border-radius:14px;
-  margin-bottom:10px;
-  cursor:pointer;
-  transition:.25s;
-}
-
-nav button:hover,
-nav button.active{
-  background:
-    rgba(99,102,241,.2);
-}
-
-main{
-  padding:30px;
-}
-
-.page{
-  display:none;
-  animation:fade .3s ease;
-}
-
-.page.active{
-  display:block;
-}
-
-@keyframes fade{
-  from{
-    opacity:0;
-    transform:translateY(10px);
-  }
-  to{
-    opacity:1;
-    transform:none;
-  }
-}
-
-.grid{
-  display:grid;
-  gap:20px;
-  grid-template-columns:
-    repeat(auto-fit,minmax(280px,1fr));
-}
-
-.card{
-  background:
-    rgba(17,24,39,.8);
-  border:
-    1px solid rgba(255,255,255,.08);
-  border-radius:var(--radius);
-  padding:24px;
-  box-shadow:var(--shadow);
-  backdrop-filter:blur(20px);
-}
-
-.card h2{
-  margin-top:0;
-}
-
-textarea,
-input,
-select{
-  width:100%;
+  font-family: system-ui, -apple-system, sans-serif;
   background:#0f172a;
-  color:white;
-  border:
-    1px solid var(--border);
-  border-radius:14px;
-  padding:14px;
-  margin-top:8px;
+  color:#fff;
+  overflow-x:hidden;
 }
 
-textarea{
-  min-height:220px;
-  resize:vertical;
-}
-
-button.primary{
-  background:
-    linear-gradient(
-      90deg,
-      var(--accent),
-      var(--accent2)
-    );
-  border:none;
-  color:white;
-  border-radius:14px;
-  padding:14px 20px;
-  cursor:pointer;
-  margin-top:14px;
-}
-
-.output{
-  white-space:pre-wrap;
-  background:#020617;
-  border-radius:14px;
-  padding:20px;
-  margin-top:20px;
-}
-
-.metric{
-  font-size:42px;
-  font-weight:700;
-}
-
-.small{
-  color:var(--muted);
-}
-
-.memory-item{
-  border-bottom:
-    1px solid rgba(255,255,255,.08);
-  padding:10px 0;
-}
-
-.toolbar{
-  display:flex;
-  gap:12px;
-  flex-wrap:wrap;
-}
-
-.context-block{
-  background:#0f172a;
-  border:
-    1px solid var(--border);
-  padding:14px;
-  border-radius:14px;
-  margin-bottom:12px;
-}
-  .cf-bg{
+/* ===== Background ===== */
+.bg {
   position:fixed;
   inset:0;
   z-index:-1;
-  overflow:hidden;
 }
 
-.blob{
+.blob {
   position:absolute;
   width:500px;
   height:500px;
   filter:blur(120px);
-  opacity:.18;
+  opacity:0.2;
   border-radius:50%;
-  animation: drift 22s infinite ease-in-out;
+  animation:float 18s infinite ease-in-out;
 }
 
-.b1{ background:#6366f1; top:-120px; left:-120px; }
-.b2{ background:#06b6d4; top:30%; right:-180px; animation-delay:-6s; }
-.b3{ background:#8b5cf6; bottom:-180px; left:30%; animation-delay:-12s; }
+.b1{background:#6366f1;top:-100px;left:-100px;}
+.b2{background:#06b6d4;top:30%;right:-150px;animation-delay:-5s;}
+.b3{background:#8b5cf6;bottom:-150px;left:30%;animation-delay:-10s;}
 
-@keyframes drift{
-  0%,100%{ transform:translate(0,0) scale(1); }
-  50%{ transform:translate(60px,-40px) scale(1.12); }
-}
-  #toastRoot{
-  position:fixed;
-  right:20px;
-  bottom:20px;
-  z-index:9999;
+@keyframes float {
+  0%,100%{transform:translate(0,0);}
+  50%{transform:translate(60px,-40px);}
 }
 
-.toast{
-  background:rgba(17,24,39,.92);
-  border:1px solid rgba(255,255,255,.08);
-  padding:12px 16px;
-  border-radius:14px;
+/* ===== Layout ===== */
+header {
+  display:flex;
+  justify-content:space-between;
+  padding:16px 24px;
+  border-bottom:1px solid rgba(255,255,255,0.1);
+  backdrop-filter:blur(10px);
+}
+
+.logo {font-weight:700;}
+
+.container {
+  display:grid;
+  grid-template-columns:220px 1fr;
+  min-height:100vh;
+}
+
+nav {
+  padding:20px;
+  border-right:1px solid rgba(255,255,255,0.1);
+}
+
+nav button {
+  width:100%;
+  margin-bottom:10px;
+  padding:10px;
+  border:none;
+  border-radius:10px;
+  background:transparent;
+  color:white;
+  cursor:pointer;
+}
+
+nav button.active {
+  background:rgba(99,102,241,0.3);
+}
+
+main {
+  padding:24px;
+}
+
+/* ===== Cards ===== */
+.card {
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:16px;
+  transition:0.2s;
+}
+
+.card:hover {
+  transform:translateY(-4px);
+}
+
+/* ===== Inputs ===== */
+textarea, input {
+  width:100%;
+  padding:12px;
+  margin-top:8px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.2);
+  background:#0b1220;
+  color:white;
+}
+
+/* ===== Buttons ===== */
+button.primary {
+  background:linear-gradient(90deg,#6366f1,#06b6d4);
+  border:none;
+  padding:10px 14px;
+  border-radius:10px;
+  color:white;
+  cursor:pointer;
   margin-top:10px;
-  transform:translateY(10px);
-  opacity:0;
-  transition:.25s ease;
-  backdrop-filter:blur(20px);
 }
 
-.toast.show{
-  transform:translateY(0);
-  opacity:1;
-}
-  button.primary{
-  transition:.2s ease;
-  transform:translateZ(0);
-}
-
-button.primary:hover{
-  transform:translateY(-2px);
+/* ===== Output ===== */
+.output {
+  margin-top:12px;
+  padding:12px;
+  background:#020617;
+  border-radius:10px;
+  min-height:40px;
+  white-space:pre-wrap;
 }
 
-button.primary:active{
-  transform:scale(.98);
-}
-
-.card{
-  transition:.25s ease;
-}
-
-.card:hover{
-  transform:translateY(-5px);
-}
-  .loading{
-  background:linear-gradient(90deg,#1f2937,#111827,#1f2937);
+/* ===== Loader ===== */
+.loader {
+  height:14px;
+  background:linear-gradient(90deg,#1e293b,#334155,#1e293b);
   background-size:200% 100%;
   animation:shimmer 1.2s infinite;
-  border-radius:10px;
-  height:20px;
-  margin:10px 0;
+  border-radius:8px;
 }
 
-@keyframes shimmer{
+@keyframes shimmer {
   0%{background-position:200% 0;}
   100%{background-position:-200% 0;}
 }
-  #cmd{
+
+/* ===== Toast ===== */
+#toast {
   position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.6);
-  display:none;
-  justify-content:center;
-  align-items:flex-start;
-  padding-top:120px;
-  z-index:99999;
+  right:20px;
+  bottom:20px;
+  z-index:999;
 }
 
-#cmd input{
-  width:600px;
-  max-width:90%;
-  padding:18px;
-  border-radius:16px;
-  border:none;
-  outline:none;
-}
-
-#cmdList{
-  width:600px;
-  max-width:90%;
-  background:#111827;
+.toast {
+  background:rgba(15,23,42,0.9);
+  border:1px solid rgba(255,255,255,0.1);
+  padding:10px 14px;
   margin-top:10px;
-  border-radius:12px;
-  overflow:hidden;
+  border-radius:10px;
+  opacity:0;
+  transform:translateY(10px);
+  transition:0.3s;
 }
+
+.toast.show {
+  opacity:1;
+  transform:translateY(0);
+}
+
+/* ===== Pages ===== */
+.page {display:none;}
+.page.active {display:block;}
 </style>
 </head>
 
 <body>
 
-  <div class="cf-bg">
+<div class="bg">
   <div class="blob b1"></div>
   <div class="blob b2"></div>
   <div class="blob b3"></div>
 </div>
 
-<div id="toastRoot"></div>
+<div id="toast"></div>
 
 <header>
-  <div class="logo">
-    Context<span>Forge</span>
-  </div>
-
-  <div class="toolbar">
-    <button
-      class="primary"
-      onclick="exportData()">
-      Export
-    </button>
-
-    <button
-      class="primary"
-      onclick="document.getElementById('import').click()">
-      Import
-    </button>
-
-    <input
-      id="import"
-      type="file"
-      hidden
-      onchange="importData(event)">
-  </div>
+  <div class="logo">Context Forge</div>
+  <button class="primary" onclick="exportData()">Export</button>
 </header>
 
-<div class="layout">
+<div class="container">
 
-<aside>
 <nav>
-<button class="nav active" data-page="dashboard">Dashboard</button>
-<button class="nav" data-page="extractor">Extractor</button>
-<button class="nav" data-page="builder">Builder</button>
-<button class="nav" data-page="optimizer">Optimizer</button>
-<button class="nav" data-page="memory">Memory</button>
-<button class="nav" data-page="evaluator">Evaluator</button>
-<button class="nav" data-page="playground">Playground</button>
+  <button class="tab active" onclick="show('dashboard')">Dashboard</button>
+  <button class="tab" onclick="show('extractor')">Extractor</button>
+  <button class="tab" onclick="show('optimizer')">Optimizer</button>
+  <button class="tab" onclick="show('evaluator')">Evaluator</button>
+  <button class="tab" onclick="show('playground')">Playground</button>
 </nav>
-</aside>
 
 <main>
 
-<section class="page active" id="dashboard">
-<div class="grid">
-
-<div class="card">
-<h2>Projects</h2>
-<div class="metric" id="projectCount">0</div>
+<!-- DASHBOARD -->
+<div id="dashboard" class="page active">
+  <div class="card">
+    <h3>System Status</h3>
+    <p>Context Forge running stable</p>
+  </div>
 </div>
 
-<div class="card">
-<h2>Memories</h2>
-<div class="metric" id="memoryCount">0</div>
+<!-- EXTRACTOR -->
+<div id="extractor" class="page">
+  <div class="card">
+    <h3>Extractor</h3>
+    <textarea id="extractText"></textarea>
+    <button class="primary" onclick="extract()">Extract</button>
+    <div class="output" id="extractOut"></div>
+  </div>
 </div>
 
-<div class="card">
-<h2>Contexts</h2>
-<div class="metric" id="contextCount">0</div>
+<!-- OPTIMIZER -->
+<div id="optimizer" class="page">
+  <div class="card">
+    <h3>Optimizer</h3>
+    <textarea id="optText"></textarea>
+    <button class="primary" onclick="optimize()">Optimize</button>
+    <div class="output" id="optOut"></div>
+  </div>
 </div>
 
+<!-- EVALUATOR -->
+<div id="evaluator" class="page">
+  <div class="card">
+    <h3>Evaluator</h3>
+    <textarea id="evalText"></textarea>
+    <button class="primary" onclick="evaluateCtx()">Evaluate</button>
+    <div class="output" id="evalOut"></div>
+  </div>
 </div>
-</section>
 
-<section class="page" id="extractor">
-<div class="card">
-<h2>Context Extractor</h2>
-
-<textarea
-id="extractText"
-placeholder="Paste conversation here"></textarea>
-
-<button
-class="primary"
-onclick="extractContext()">
-Extract Context
-</button>
-
-<div
-id="extractOutput"
-class="output"></div>
+<!-- PLAYGROUND -->
+<div id="playground" class="page">
+  <div class="card">
+    <h3>Playground</h3>
+    <textarea id="chatText"></textarea>
+    <button class="primary" onclick="chat()">Run</button>
+    <div class="output" id="chatOut"></div>
+  </div>
 </div>
-</section>
-
-<section class="page" id="builder">
-<div class="card">
-<h2>Context Builder</h2>
-
-<input
-id="blockTitle"
-placeholder="Block title">
-
-<textarea
-id="blockContent"
-placeholder="Block content"></textarea>
-
-<button
-class="primary"
-onclick="addBlock()">
-Add Block
-</button>
-
-<div id="blocks"></div>
-</div>
-</section>
-
-<section class="page" id="optimizer">
-<div class="card">
-<h2>Context Optimizer</h2>
-
-<textarea
-id="optimizeText"
-placeholder="Context"></textarea>
-
-<button
-class="primary"
-onclick="optimizeContext()">
-Optimize
-</button>
-
-<div
-id="optimizeOutput"
-class="output"></div>
-</div>
-</section>
-
-<section class="page" id="memory">
-<div class="card">
-<h2>Memory Manager</h2>
-
-<input
-id="memoryInput"
-placeholder="New memory">
-
-<button
-class="primary"
-onclick="saveMemory()">
-Save
-</button>
-
-<div id="memoryList"></div>
-</div>
-</section>
-
-<section class="page" id="evaluator">
-<div class="card">
-<h2>Context Evaluator</h2>
-
-<textarea
-id="evaluateText"
-placeholder="Context"></textarea>
-
-<button
-class="primary"
-onclick="evaluateContext()">
-Evaluate
-</button>
-
-<div
-id="evaluateOutput"
-class="output"></div>
-</div>
-</section>
-
-<section class="page" id="playground">
-<div class="card">
-<h2>Playground</h2>
-
-<textarea
-id="playPrompt"
-placeholder="Prompt"></textarea>
-
-<button
-class="primary"
-onclick="chat()">
-Send
-</button>
-
-<div
-id="playOutput"
-class="output"></div>
-</div>
-</section>
 
 </main>
 </div>
 
 <script>
-const API =
-"https://context-forge-api.iggy-mw.workers.dev";
 
-const db = {
-  projects:
-    JSON.parse(
-      localStorage.getItem(
-        "cf-projects"
-      ) || "[]"
-    ),
+const API = "https://context-forge-api.iggy-mw.workers.dev";
 
-  memories:
-    JSON.parse(
-      localStorage.getItem(
-        "cf-memories"
-      ) || "[]"
-    ),
+function show(page){
+  document.querySelectorAll(".page")
+    .forEach(p=>p.classList.remove("active"));
 
-  contexts:
-    JSON.parse(
-      localStorage.getItem(
-        "cf-contexts"
-      ) || "[]"
-    )
-};
-
-function persist() {
-  localStorage.setItem(
-    "cf-projects",
-    JSON.stringify(db.projects)
-  );
-
-  localStorage.setItem(
-    "cf-memories",
-    JSON.stringify(db.memories)
-  );
-
-  localStorage.setItem(
-    "cf-contexts",
-    JSON.stringify(db.contexts)
-  );
-
-  renderDashboard();
+  document.getElementById(page).classList.add("active");
 }
 
-function renderDashboard() {
-animate(projectCount, db.projects.length);
-animate(memoryCount, db.memories.length);
-animate(contextCount, db.contexts.length);
+function toast(msg){
+  const el=document.createElement("div");
+  el.className="toast";
+  el.innerText=msg;
+  document.getElementById("toast").appendChild(el);
+  setTimeout(()=>el.classList.add("show"),10);
+  setTimeout(()=>el.remove(),2500);
 }
 
-document
-.querySelectorAll(".nav")
-.forEach(btn=>{
-  btn.onclick=()=>{
-    document
-      .querySelectorAll(".nav")
-      .forEach(
-        x=>x.classList.remove(
-          "active"
-        )
-      );
-
-    btn.classList.add(
-      "active"
-    );
-
-    document
-      .querySelectorAll(".page")
-      .forEach(
-        x=>x.classList.remove(
-          "active"
-        )
-      );
-
-    document
-      .getElementById(
-        btn.dataset.page
-      )
-      .classList.add(
-        "active"
-      );
-  };
-});
-
-async function call(
-  endpoint,
-  payload
-){
-  const r =
-    await fetch(
-      API + endpoint,
-      {
-        method:"POST",
-        headers:{
-          "Content-Type":
-            "application/json"
-        },
-        body:
-          JSON.stringify(
-            payload
-          )
-      }
-    );
-
-  return r.json();
+function loading(el){
+  el.innerHTML = `<div class="loader"></div>`;
 }
 
-async function extractContext() {
+function render(el,text){
+  el.textContent = text || "[no response]";
+}
 
-  // 1. SHOW LOADING IMMEDIATELY (this is where setLoading goes)
-  setLoading(extractOutput);
+async function call(endpoint, body){
+  const res = await fetch(API + endpoint, {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify(body)
+  });
+  return res.json();
+}
 
-  // 2. CALL API
-  const result = await call("/extract", {
-    text: extractText.value
+/* ===== Extract ===== */
+async function extract(){
+  const out=document.getElementById("extractOut");
+  loading(out);
+
+  const res = await call("/extract",{
+    text:document.getElementById("extractText").value
   });
 
-  // 3. RENDER RESULT
-  setResult(extractOutput, result.context || "");
+  render(out,res.context);
+  toast("Extracted");
+}
 
-  // 4. STORE LOCALLY
-  db.contexts.push({
-    type: "extract",
-    content: result.context,
-    created: Date.now()
+/* ===== Optimize ===== */
+async function optimize(){
+  const out=document.getElementById("optOut");
+  loading(out);
+
+  const res = await call("/optimize",{
+    text:document.getElementById("optText").value
   });
 
-  persist();
-
-  // 5. FEEDBACK
-  toast("Context extracted");
-}
-async function optimizeContext() {
-
-  // 1. show loading safely
-  setLoading(optimizeOutput);
-
-  try {
-
-    // 2. call worker
-    const result = await call("/optimize", {
-      text: optimizeText.value
-    });
-
-    // 3. render result safely
-    setResult(
-      optimizeOutput,
-      result.optimized || ""
-    );
-
-    toast("Context optimized");
-
-  } catch (err) {
-
-    setResult(
-      optimizeOutput,
-      "Optimization failed: " + err.message
-    );
-
-    toast("Optimizer error");
-  }
+  render(out,res.optimized);
+  toast("Optimized");
 }
 
-async function evaluateContext() {
-  evaluateOutput.textContent =
-    extractOutput.innerHTML = `<div class="loading"></div>`;
+/* ===== Evaluate ===== */
+async function evaluateCtx(){
+  const out=document.getElementById("evalOut");
+  loading(out);
 
-  const result =
-    await call(
-      "/evaluate",
-      {
-        text:
-          evaluateText.value
-      }
-    );
-
-  evaluateOutput.textContent =
-    result.evaluation || "";
-}
-
-async function chat() {
-  playOutput.textContent =
-    "Thinking...";
-
-  const result =
-    await call(
-      "/chat",
-      {
-        prompt:
-          playPrompt.value
-      }
-    );
-
-  playOutput.textContent =
-    result.response || "";
-}
-
-function saveMemory() {
-  if(
-    !memoryInput.value.trim()
-  ) return;
-
-  db.memories.push({
-    text:
-      memoryInput.value,
-    created:
-      new Date()
-        .toISOString()
+  const res = await call("/evaluate",{
+    text:document.getElementById("evalText").value
   });
 
-  memoryInput.value = "";
-
-  renderMemories();
-  persist();
+  render(out,res.evaluation);
+  toast("Evaluated");
 }
 
-function renderMemories() {
-  memoryList.innerHTML =
-    "";
+/* ===== Chat ===== */
+async function chat(){
+  const out=document.getElementById("chatOut");
+  loading(out);
 
-  db.memories.forEach(
-    m=>{
-      const div =
-        document.createElement(
-          "div"
-        );
-
-      div.className =
-        "memory-item";
-
-      div.innerHTML =
-        `
-        <div>${m.text}</div>
-        <div class="small">
-        ${m.created}
-        </div>
-        `;
-
-      memoryList.appendChild(
-        div
-      );
-    }
-  );
-}
-
-function addBlock() {
-  const title =
-    blockTitle.value;
-
-  const content =
-    blockContent.value;
-
-  if(
-    !title ||
-    !content
-  ) return;
-
-  db.contexts.push({
-    title,
-    content
+  const res = await call("/chat",{
+    prompt:document.getElementById("chatText").value
   });
 
-  blockTitle.value="";
-  blockContent.value="";
-
-  renderBlocks();
-  persist();
+  render(out,res.response);
 }
 
-function renderBlocks() {
-  blocks.innerHTML = "";
-
-  db.contexts.forEach(
-    c=>{
-      const div =
-        document.createElement(
-          "div"
-        );
-
-      div.className =
-        "context-block";
-
-      div.innerHTML =
-        `
-        <strong>
-        ${c.title ||
-          "Context"}
-        </strong>
-        <div>
-        ${c.content}
-        </div>
-        `;
-
-      blocks.appendChild(
-        div
-      );
-    }
-  );
-}
-
-function exportData() {
-  const blob =
-    new Blob(
-      [
-        JSON.stringify(
-          db,
-          null,
-          2
-        )
-      ],
-      {
-        type:
-          "application/json"
-      }
-    );
-
-  const a =
-    document.createElement(
-      "a"
-    );
-
-  a.href =
-    URL.createObjectURL(
-      blob
-    );
-
-  a.download =
-    "context-forge.json";
-
+/* ===== Export ===== */
+function exportData(){
+  const blob = new Blob([JSON.stringify(localStorage)],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="context-forge.json";
   a.click();
 }
 
-function importData(e) {
-  const file =
-    e.target.files[0];
-
-  if(!file) return;
-
-  const reader =
-    new FileReader();
-
-  reader.onload=()=>{
-    const data =
-      JSON.parse(
-        reader.result
-      );
-
-    db.projects =
-      data.projects || [];
-
-    db.memories =
-      data.memories || [];
-
-    db.contexts =
-      data.contexts || [];
-
-    persist();
-    renderBlocks();
-    renderMemories();
-
-    toast("Imported successfully");
-  };
-
-  reader.readAsText(file);
-}
-
-renderDashboard();
-renderBlocks();
-renderMemories();
-  function toast(msg){
-  const el = document.createElement("div");
-  el.className = "toast";
-  el.innerText = msg;
-
-  document.getElementById("toastRoot").appendChild(el);
-
-  requestAnimationFrame(() => el.classList.add("show"));
-
-  setTimeout(() => {
-    el.classList.remove("show");
-    setTimeout(() => el.remove(), 300);
-  }, 2500);
-}
-  function animate(el, value){
-  let start = 0;
-  const step = Math.ceil(value / 30);
-
-  const i = setInterval(() => {
-    start += step;
-    if(start >= value){
-      start = value;
-      clearInterval(i);
-    }
-    el.textContent = start;
-  }, 16);
-}
-  const commands = [
-  "Dashboard",
-  "Extractor",
-  "Builder",
-  "Optimizer",
-  "Memory",
-  "Evaluator",
-  "Playground",
-  "Export"
-];
-
-document.addEventListener("keydown", (e)=>{
-  if(e.ctrlKey && e.key==="k"){
-    e.preventDefault();
-    document.getElementById("cmd").style.display="flex";
-  }
-});
-
-cmdInput.addEventListener("input", ()=>{
-  cmdList.innerHTML = "";
-  commands
-    .filter(c => c.toLowerCase().includes(cmdInput.value.toLowerCase()))
-    .forEach(c=>{
-      const div = document.createElement("div");
-      div.style.padding="12px";
-      div.style.cursor="pointer";
-      div.innerText=c;
-      div.onclick=()=>{
-        document.getElementById("cmd").style.display="none";
-      };
-      cmdList.appendChild(div);
-    });
-});
-
-  function setLoading(el){
-  el.innerHTML = `<div class="loading"></div>`;
-}
-
-function setResult(el, text){
-  el.textContent = text;
-}
-
-  function setLoading(el){
-  el.innerHTML = `<div class="loading"></div>`;
-}
-
-function setResult(el, text){
-  el.textContent = text;
-}
 </script>
-<div id="cmd">
-  <input id="cmdInput" placeholder="Type command..." />
-  <div id="cmdList"></div>
-</div>
+
 </body>
 </html>
-
