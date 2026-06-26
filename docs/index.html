@@ -1,0 +1,785 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta
+  name="viewport"
+  content="width=device-width,initial-scale=1"
+/>
+
+<title>Context Forge</title>
+
+<style>
+:root{
+  --bg:#0f172a;
+  --panel:#111827;
+  --panel2:#1f2937;
+  --border:#334155;
+  --text:#f8fafc;
+  --muted:#94a3b8;
+  --accent:#6366f1;
+  --accent2:#06b6d4;
+  --radius:20px;
+  --shadow:
+    0 20px 60px rgba(0,0,0,.35);
+}
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  font-family:
+    Inter,
+    system-ui,
+    sans-serif;
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(99,102,241,.25),
+      transparent 40%
+    ),
+    radial-gradient(
+      circle at top right,
+      rgba(6,182,212,.2),
+      transparent 40%
+    ),
+    var(--bg);
+  color:var(--text);
+  min-height:100vh;
+}
+
+header{
+  height:72px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 30px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  backdrop-filter:blur(20px);
+  position:sticky;
+  top:0;
+  background:rgba(15,23,42,.75);
+  z-index:100;
+}
+
+.logo{
+  font-size:24px;
+  font-weight:700;
+}
+
+.logo span{
+  color:var(--accent2);
+}
+
+.layout{
+  display:grid;
+  grid-template-columns:
+    260px 1fr;
+  min-height:
+    calc(100vh - 72px);
+}
+
+aside{
+  border-right:
+    1px solid rgba(255,255,255,.08);
+  padding:20px;
+}
+
+nav button{
+  width:100%;
+  border:none;
+  background:none;
+  color:var(--text);
+  text-align:left;
+  padding:14px;
+  border-radius:14px;
+  margin-bottom:10px;
+  cursor:pointer;
+  transition:.25s;
+}
+
+nav button:hover,
+nav button.active{
+  background:
+    rgba(99,102,241,.2);
+}
+
+main{
+  padding:30px;
+}
+
+.page{
+  display:none;
+  animation:fade .3s ease;
+}
+
+.page.active{
+  display:block;
+}
+
+@keyframes fade{
+  from{
+    opacity:0;
+    transform:translateY(10px);
+  }
+  to{
+    opacity:1;
+    transform:none;
+  }
+}
+
+.grid{
+  display:grid;
+  gap:20px;
+  grid-template-columns:
+    repeat(auto-fit,minmax(280px,1fr));
+}
+
+.card{
+  background:
+    rgba(17,24,39,.8);
+  border:
+    1px solid rgba(255,255,255,.08);
+  border-radius:var(--radius);
+  padding:24px;
+  box-shadow:var(--shadow);
+  backdrop-filter:blur(20px);
+}
+
+.card h2{
+  margin-top:0;
+}
+
+textarea,
+input,
+select{
+  width:100%;
+  background:#0f172a;
+  color:white;
+  border:
+    1px solid var(--border);
+  border-radius:14px;
+  padding:14px;
+  margin-top:8px;
+}
+
+textarea{
+  min-height:220px;
+  resize:vertical;
+}
+
+button.primary{
+  background:
+    linear-gradient(
+      90deg,
+      var(--accent),
+      var(--accent2)
+    );
+  border:none;
+  color:white;
+  border-radius:14px;
+  padding:14px 20px;
+  cursor:pointer;
+  margin-top:14px;
+}
+
+.output{
+  white-space:pre-wrap;
+  background:#020617;
+  border-radius:14px;
+  padding:20px;
+  margin-top:20px;
+}
+
+.metric{
+  font-size:42px;
+  font-weight:700;
+}
+
+.small{
+  color:var(--muted);
+}
+
+.memory-item{
+  border-bottom:
+    1px solid rgba(255,255,255,.08);
+  padding:10px 0;
+}
+
+.toolbar{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.context-block{
+  background:#0f172a;
+  border:
+    1px solid var(--border);
+  padding:14px;
+  border-radius:14px;
+  margin-bottom:12px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">
+    Context<span>Forge</span>
+  </div>
+
+  <div class="toolbar">
+    <button
+      class="primary"
+      onclick="exportData()">
+      Export
+    </button>
+
+    <button
+      class="primary"
+      onclick="document.getElementById('import').click()">
+      Import
+    </button>
+
+    <input
+      id="import"
+      type="file"
+      hidden
+      onchange="importData(event)">
+  </div>
+</header>
+
+<div class="layout">
+
+<aside>
+<nav>
+<button class="nav active" data-page="dashboard">Dashboard</button>
+<button class="nav" data-page="extractor">Extractor</button>
+<button class="nav" data-page="builder">Builder</button>
+<button class="nav" data-page="optimizer">Optimizer</button>
+<button class="nav" data-page="memory">Memory</button>
+<button class="nav" data-page="evaluator">Evaluator</button>
+<button class="nav" data-page="playground">Playground</button>
+</nav>
+</aside>
+
+<main>
+
+<section class="page active" id="dashboard">
+<div class="grid">
+
+<div class="card">
+<h2>Projects</h2>
+<div class="metric" id="projectCount">0</div>
+</div>
+
+<div class="card">
+<h2>Memories</h2>
+<div class="metric" id="memoryCount">0</div>
+</div>
+
+<div class="card">
+<h2>Contexts</h2>
+<div class="metric" id="contextCount">0</div>
+</div>
+
+</div>
+</section>
+
+<section class="page" id="extractor">
+<div class="card">
+<h2>Context Extractor</h2>
+
+<textarea
+id="extractText"
+placeholder="Paste conversation here"></textarea>
+
+<button
+class="primary"
+onclick="extractContext()">
+Extract Context
+</button>
+
+<div
+id="extractOutput"
+class="output"></div>
+</div>
+</section>
+
+<section class="page" id="builder">
+<div class="card">
+<h2>Context Builder</h2>
+
+<input
+id="blockTitle"
+placeholder="Block title">
+
+<textarea
+id="blockContent"
+placeholder="Block content"></textarea>
+
+<button
+class="primary"
+onclick="addBlock()">
+Add Block
+</button>
+
+<div id="blocks"></div>
+</div>
+</section>
+
+<section class="page" id="optimizer">
+<div class="card">
+<h2>Context Optimizer</h2>
+
+<textarea
+id="optimizeText"
+placeholder="Context"></textarea>
+
+<button
+class="primary"
+onclick="optimizeContext()">
+Optimize
+</button>
+
+<div
+id="optimizeOutput"
+class="output"></div>
+</div>
+</section>
+
+<section class="page" id="memory">
+<div class="card">
+<h2>Memory Manager</h2>
+
+<input
+id="memoryInput"
+placeholder="New memory">
+
+<button
+class="primary"
+onclick="saveMemory()">
+Save
+</button>
+
+<div id="memoryList"></div>
+</div>
+</section>
+
+<section class="page" id="evaluator">
+<div class="card">
+<h2>Context Evaluator</h2>
+
+<textarea
+id="evaluateText"
+placeholder="Context"></textarea>
+
+<button
+class="primary"
+onclick="evaluateContext()">
+Evaluate
+</button>
+
+<div
+id="evaluateOutput"
+class="output"></div>
+</div>
+</section>
+
+<section class="page" id="playground">
+<div class="card">
+<h2>Playground</h2>
+
+<textarea
+id="playPrompt"
+placeholder="Prompt"></textarea>
+
+<button
+class="primary"
+onclick="chat()">
+Send
+</button>
+
+<div
+id="playOutput"
+class="output"></div>
+</div>
+</section>
+
+</main>
+</div>
+
+<script>
+const API =
+"https://context-forge-api.iggy-mw.workers.dev";
+
+const db = {
+  projects:
+    JSON.parse(
+      localStorage.getItem(
+        "cf-projects"
+      ) || "[]"
+    ),
+
+  memories:
+    JSON.parse(
+      localStorage.getItem(
+        "cf-memories"
+      ) || "[]"
+    ),
+
+  contexts:
+    JSON.parse(
+      localStorage.getItem(
+        "cf-contexts"
+      ) || "[]"
+    )
+};
+
+function persist() {
+  localStorage.setItem(
+    "cf-projects",
+    JSON.stringify(db.projects)
+  );
+
+  localStorage.setItem(
+    "cf-memories",
+    JSON.stringify(db.memories)
+  );
+
+  localStorage.setItem(
+    "cf-contexts",
+    JSON.stringify(db.contexts)
+  );
+
+  renderDashboard();
+}
+
+function renderDashboard() {
+  projectCount.textContent =
+    db.projects.length;
+
+  memoryCount.textContent =
+    db.memories.length;
+
+  contextCount.textContent =
+    db.contexts.length;
+}
+
+document
+.querySelectorAll(".nav")
+.forEach(btn=>{
+  btn.onclick=()=>{
+    document
+      .querySelectorAll(".nav")
+      .forEach(
+        x=>x.classList.remove(
+          "active"
+        )
+      );
+
+    btn.classList.add(
+      "active"
+    );
+
+    document
+      .querySelectorAll(".page")
+      .forEach(
+        x=>x.classList.remove(
+          "active"
+        )
+      );
+
+    document
+      .getElementById(
+        btn.dataset.page
+      )
+      .classList.add(
+        "active"
+      );
+  };
+});
+
+async function call(
+  endpoint,
+  payload
+){
+  const r =
+    await fetch(
+      API + endpoint,
+      {
+        method:"POST",
+        headers:{
+          "Content-Type":
+            "application/json"
+        },
+        body:
+          JSON.stringify(
+            payload
+          )
+      }
+    );
+
+  return r.json();
+}
+
+async function extractContext() {
+  extractOutput.textContent =
+    "Working...";
+
+  const result =
+    await call(
+      "/extract",
+      {
+        text:
+          extractText.value
+      }
+    );
+
+  extractOutput.textContent =
+    result.context || "";
+
+  db.contexts.push({
+    type:"extract",
+    content:
+      result.context
+  });
+
+  persist();
+}
+
+async function optimizeContext() {
+  optimizeOutput.textContent =
+    "Working...";
+
+  const result =
+    await call(
+      "/optimize",
+      {
+        text:
+          optimizeText.value
+      }
+    );
+
+  optimizeOutput.textContent =
+    result.optimized || "";
+}
+
+async function evaluateContext() {
+  evaluateOutput.textContent =
+    "Working...";
+
+  const result =
+    await call(
+      "/evaluate",
+      {
+        text:
+          evaluateText.value
+      }
+    );
+
+  evaluateOutput.textContent =
+    result.evaluation || "";
+}
+
+async function chat() {
+  playOutput.textContent =
+    "Thinking...";
+
+  const result =
+    await call(
+      "/chat",
+      {
+        prompt:
+          playPrompt.value
+      }
+    );
+
+  playOutput.textContent =
+    result.response || "";
+}
+
+function saveMemory() {
+  if(
+    !memoryInput.value.trim()
+  ) return;
+
+  db.memories.push({
+    text:
+      memoryInput.value,
+    created:
+      new Date()
+        .toISOString()
+  });
+
+  memoryInput.value = "";
+
+  renderMemories();
+  persist();
+}
+
+function renderMemories() {
+  memoryList.innerHTML =
+    "";
+
+  db.memories.forEach(
+    m=>{
+      const div =
+        document.createElement(
+          "div"
+        );
+
+      div.className =
+        "memory-item";
+
+      div.innerHTML =
+        `
+        <div>${m.text}</div>
+        <div class="small">
+        ${m.created}
+        </div>
+        `;
+
+      memoryList.appendChild(
+        div
+      );
+    }
+  );
+}
+
+function addBlock() {
+  const title =
+    blockTitle.value;
+
+  const content =
+    blockContent.value;
+
+  if(
+    !title ||
+    !content
+  ) return;
+
+  db.contexts.push({
+    title,
+    content
+  });
+
+  blockTitle.value="";
+  blockContent.value="";
+
+  renderBlocks();
+  persist();
+}
+
+function renderBlocks() {
+  blocks.innerHTML = "";
+
+  db.contexts.forEach(
+    c=>{
+      const div =
+        document.createElement(
+          "div"
+        );
+
+      div.className =
+        "context-block";
+
+      div.innerHTML =
+        `
+        <strong>
+        ${c.title ||
+          "Context"}
+        </strong>
+        <div>
+        ${c.content}
+        </div>
+        `;
+
+      blocks.appendChild(
+        div
+      );
+    }
+  );
+}
+
+function exportData() {
+  const blob =
+    new Blob(
+      [
+        JSON.stringify(
+          db,
+          null,
+          2
+        )
+      ],
+      {
+        type:
+          "application/json"
+      }
+    );
+
+  const a =
+    document.createElement(
+      "a"
+    );
+
+  a.href =
+    URL.createObjectURL(
+      blob
+    );
+
+  a.download =
+    "context-forge.json";
+
+  a.click();
+}
+
+function importData(e) {
+  const file =
+    e.target.files[0];
+
+  if(!file) return;
+
+  const reader =
+    new FileReader();
+
+  reader.onload=()=>{
+    const data =
+      JSON.parse(
+        reader.result
+      );
+
+    db.projects =
+      data.projects || [];
+
+    db.memories =
+      data.memories || [];
+
+    db.contexts =
+      data.contexts || [];
+
+    persist();
+    renderBlocks();
+    renderMemories();
+
+    alert(
+      "Imported."
+    );
+  };
+
+  reader.readAsText(file);
+}
+
+renderDashboard();
+renderBlocks();
+renderMemories();
+</script>
+
+</body>
+</html>
+```
